@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/project_repository.dart';
 import '../../models/project.dart';
+import '../auth/auth_provider.dart';
 
 /// To use the real backend later, swap MockProjectRepository() only.
 final projectRepoProvider =
@@ -26,10 +27,51 @@ class FilterNotifier extends Notifier<ProjectFilter> {
 final filterProvider =
     NotifierProvider<FilterNotifier, ProjectFilter>(FilterNotifier.new);
 
-/// Re-fetches automatically whenever the filter changes.
+/// Open projects, re-fetched whenever the filter changes.
 final projectsProvider = FutureProvider<List<Project>>((ref) {
   final f = ref.watch(filterProvider);
   return ref
       .watch(projectRepoProvider)
       .getProjects(query: f.query, domain: f.domain);
 });
+
+/// The logged-in client's own listings (any status).
+final myProjectsProvider = FutureProvider<List<Project>>((ref) {
+  final user = ref.watch(authProvider);
+  if (user == null) return <Project>[];
+  return ref.watch(projectRepoProvider).getProjectsByClient(user.id);
+});
+
+final projectByIdProvider = FutureProvider.family<Project?, String>(
+    (ref, id) => ref.watch(projectRepoProvider).getProject(id));
+
+/// Write actions. Each one refreshes the lists that changed.
+class ProjectActions {
+  ProjectActions(this._ref);
+  final Ref _ref;
+
+  void _refresh() {
+    _ref.invalidate(projectsProvider);
+    _ref.invalidate(myProjectsProvider);
+    _ref.invalidate(projectByIdProvider);
+  }
+
+  Future<void> create(Project project) async {
+    await _ref.read(projectRepoProvider).createProject(project);
+    _refresh();
+  }
+
+  Future<void> close(String projectId) async {
+    await _ref.read(projectRepoProvider).setStatus(projectId, ProjectStatus.closed);
+    _refresh();
+  }
+
+  Future<void> markInProgress(String projectId) async {
+    await _ref
+        .read(projectRepoProvider)
+        .setStatus(projectId, ProjectStatus.inProgress);
+    _refresh();
+  }
+}
+
+final projectActionsProvider = Provider<ProjectActions>((ref) => ProjectActions(ref));

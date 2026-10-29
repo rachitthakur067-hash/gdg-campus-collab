@@ -20,6 +20,7 @@ class Project {
     required this.status,
     required this.clientId,
     required this.clientName,
+    this.deliverables = '',
   });
 
   final String id;
@@ -31,4 +32,18 @@ class Project {
   final ProjectStatus status;
   final String clientId;
   final String clientName;
+  final String deliverables;
+
+  Project copyWith({ProjectStatus? status}) => Project(
+        id: id,
+        title: title,
+        description: description,
+        domain: domain,
+        skills: skills,
+        deadline: deadline,
+        status: status ?? this.status,
+        clientId: clientId,
+        clientName: clientName,
+        deliverables: deliverables,
+      );
 }

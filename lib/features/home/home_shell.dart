@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../models/app_user.dart';
+import '../applications/applicants_screen.dart';
+import '../applications/my_applications_screen.dart';
 import '../auth/auth_provider.dart';
 import '../marketplace/marketplace_screen.dart';
 import '../profile/profile_screen.dart';
 import '../shared/placeholder_screen.dart';
+import '../teams/teams_screen.dart';
 
 class _TabDef {
   const _TabDef(this.label, this.icon, this.page);
@@ -22,12 +25,8 @@ List<_TabDef> _tabsFor(UserRole role) {
     case UserRole.student:
       return [
         const _TabDef('Browse', Icons.search, MarketplaceScreen()),
-        const _TabDef(
-            'Applied',
-            Icons.send_outlined,
-            PlaceholderScreen(
-                title: 'My applications',
-                hint: 'Phase 3: application statuses appear here.')),
+        const _TabDef('Applied', Icons.send_outlined, MyApplicationsScreen()),
+        const _TabDef('Teams', Icons.groups_outlined, TeamsScreen()),
         const _TabDef(
             'Workspace',
             Icons.checklist,
@@ -39,12 +38,7 @@ List<_TabDef> _tabsFor(UserRole role) {
     case UserRole.client:
       return [
         const _TabDef('Listings', Icons.list_alt, MarketplaceScreen()),
-        const _TabDef(
-            'Applicants',
-            Icons.groups_outlined,
-            PlaceholderScreen(
-                title: 'Applicants',
-                hint: 'Phase 3: shortlist, accept or decline teams.')),
+        const _TabDef('Applicants', Icons.groups_outlined, ApplicantsScreen()),
         const _TabDef(
             'Feed',
             Icons.notifications_none,
