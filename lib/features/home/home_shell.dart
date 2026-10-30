@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../models/app_user.dart';
+import '../activity/activity_providers.dart';
+import '../activity/feed_screen.dart';
 import '../applications/applicants_screen.dart';
 import '../applications/my_applications_screen.dart';
 import '../auth/auth_provider.dart';
 import '../marketplace/marketplace_screen.dart';
 import '../profile/profile_screen.dart';
 import '../shared/placeholder_screen.dart';
-import '../teams/teams_screen.dart';
 import '../workspace/workspace_list_screen.dart';
 
 class _TabDef {
@@ -18,22 +19,17 @@ class _TabDef {
   final Widget page;
 }
 
-/// Each role gets its own bottom tabs. Replace the placeholders as you
-/// build each phase.
+/// Each role gets its own bottom tabs.
 List<_TabDef> _tabsFor(UserRole role) {
   const profile = _TabDef('Profile', Icons.person_outline, ProfileScreen());
-  const feed = _TabDef(
-      'Feed',
-      Icons.notifications_none,
-      PlaceholderScreen(
-          title: 'Activity', hint: 'Phase 6: notification feed.'));
+  const feed = _TabDef('Feed', Icons.notifications_none, FeedScreen());
   switch (role) {
     case UserRole.student:
       return [
         const _TabDef('Browse', Icons.search, MarketplaceScreen()),
         const _TabDef('Applied', Icons.send_outlined, MyApplicationsScreen()),
-        const _TabDef('Teams', Icons.groups_outlined, TeamsScreen()),
         const _TabDef('Workspace', Icons.checklist, WorkspaceListScreen()),
+        feed,
         profile,
       ];
     case UserRole.client:
@@ -53,7 +49,7 @@ List<_TabDef> _tabsFor(UserRole role) {
             Icons.rate_review_outlined,
             PlaceholderScreen(
                 title: 'Reviews',
-                hint: 'Mentor reviews come after the client flow is done.')),
+                hint: 'Mentor reviews are planned as future work.')),
         feed,
         profile,
       ];
@@ -74,6 +70,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   Widget build(BuildContext context) {
     final user = ref.watch(authProvider);
     if (user == null) return const SizedBox.shrink();
+    final unread = ref.watch(unreadCountProvider);
     final tabs = _tabsFor(user.role);
     return Scaffold(
       body: IndexedStack(
@@ -85,7 +82,12 @@ class _HomeShellState extends ConsumerState<HomeShell> {
         onDestinationSelected: (i) => setState(() => _index = i),
         destinations: [
           for (final t in tabs)
-            NavigationDestination(icon: Icon(t.icon), label: t.label),
+            NavigationDestination(
+              icon: t.label == 'Feed' && unread > 0
+                  ? Badge.count(count: unread, child: Icon(t.icon))
+                  : Icon(t.icon),
+              label: t.label,
+            ),
         ],
       ),
     );

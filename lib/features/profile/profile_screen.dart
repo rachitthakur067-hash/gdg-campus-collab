@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../models/app_user.dart';
+import 'package:go_router/go_router.dart';
+
 import '../../core/theme.dart';
 import '../../core/widgets/status_chip.dart';
+import '../../models/app_user.dart';
 import '../auth/auth_provider.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -48,7 +50,18 @@ class ProfileScreen extends ConsumerWidget {
                   spacing: 6,
                   runSpacing: 6,
                   children: [for (final s in user.skills) StatusChip(s)]),
-          const SizedBox(height: 32),
+          if (user.role == UserRole.student) ...[
+            const SizedBox(height: 24),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.groups_outlined),
+              title: const Text('My teams'),
+              subtitle: const Text('Create teams and manage members'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/teams'),
+            ),
+          ],
+          const SizedBox(height: 24),
           OutlinedButton(
             onPressed: () => ref.read(authProvider.notifier).signOut(),
             child: const Text('Sign out'),

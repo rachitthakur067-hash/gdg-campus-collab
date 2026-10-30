@@ -7,6 +7,7 @@ import '../../models/project.dart';
 import '../../models/workspace.dart';
 import '../applications/application_providers.dart';
 import '../auth/auth_provider.dart';
+import '../activity/activity_providers.dart';
 import '../marketplace/providers.dart';
 import '../teams/team_providers.dart';
 
@@ -115,6 +116,8 @@ class WorkspaceActions {
 
   Future<void> addTask(WorkTask t) async {
     await _repo.addTask(t);
+    await _ref.read(activityLoggerProvider).log(
+        projectId: t.projectId, message: 'Task added: ${t.title}');
     _refresh();
   }
 
@@ -125,22 +128,43 @@ class WorkspaceActions {
 
   Future<void> addMilestone(Milestone m) async {
     await _repo.addMilestone(m);
+    await _ref.read(activityLoggerProvider).log(
+        projectId: m.projectId,
+        message: 'New milestone: ${m.title}',
+        toTeam: true);
     _refresh();
   }
 
-  Future<void> submitMilestone(String id, String link) async {
-    await _repo.submitMilestone(id, link);
+  Future<void> submitMilestone(Milestone m, String link) async {
+    await _repo.submitMilestone(m.id, link);
+    await _ref.read(activityLoggerProvider).log(
+        projectId: m.projectId,
+        message: 'Milestone submitted: ${m.title}',
+        toClient: true);
     _refresh();
   }
 
-  Future<void> reviewMilestone(String id, List<ChecklistItem> checklist,
+  Future<void> reviewMilestone(Milestone m, List<ChecklistItem> checklist,
       String feedback, bool approved) async {
-    await _repo.reviewMilestone(id, checklist, feedback, approved);
+    await _repo.reviewMilestone(m.id, checklist, feedback, approved);
+    await _ref.read(activityLoggerProvider).log(
+        projectId: m.projectId,
+        message: approved
+            ? 'Milestone approved: ${m.title}'
+            : 'Changes requested on ${m.title}',
+        toTeam: true);
     _refresh();
   }
 
   Future<void> addPost(ProjectPost p) async {
     await _repo.addPost(p);
+    await _ref.read(activityLoggerProvider).log(
+        projectId: p.projectId,
+        message: p.isAnnouncement
+            ? '${p.authorName} posted an announcement'
+            : '${p.authorName} commented',
+        toClient: p.authorRole != 'Client',
+        toTeam: p.authorRole == 'Client');
     _refresh();
   }
 }

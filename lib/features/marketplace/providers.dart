@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/project_repository.dart';
 import '../../models/project.dart';
 import '../auth/auth_provider.dart';
+import '../activity/activity_providers.dart';
 
 /// To use the real backend later, swap MockProjectRepository() only.
 final projectRepoProvider =
@@ -58,11 +59,21 @@ class ProjectActions {
 
   Future<void> create(Project project) async {
     await _ref.read(projectRepoProvider).createProject(project);
+    await _ref.read(activityLoggerProvider).log(
+        projectId: project.id,
+        message: '${project.clientName} published ${project.title}');
     _refresh();
   }
 
   Future<void> close(String projectId) async {
-    await _ref.read(projectRepoProvider).setStatus(projectId, ProjectStatus.closed);
+    await _ref
+        .read(projectRepoProvider)
+        .setStatus(projectId, ProjectStatus.closed);
+    await _ref.read(activityLoggerProvider).log(
+        projectId: projectId,
+        message: 'Project closed',
+        toClient: true,
+        toTeam: true);
     _refresh();
   }
 

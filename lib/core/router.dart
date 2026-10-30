@@ -11,6 +11,8 @@ import '../features/marketplace/create_project_screen.dart';
 import '../features/marketplace/project_detail_screen.dart';
 import '../features/teams/create_team_screen.dart';
 import '../features/teams/team_profile_screen.dart';
+import '../features/teams/teams_screen.dart';
+import '../features/workspace/review_screen.dart';
 import '../features/workspace/workspace_screen.dart';
 import '../models/app_user.dart';
 
@@ -53,6 +55,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
+      GoRoute(path: '/teams', builder: (context, state) => const TeamsScreen()),
       GoRoute(
         path: '/create-team',
         builder: (context, state) => const CreateTeamScreen(),
@@ -66,6 +69,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/workspace/:id',
         builder: (context, state) =>
             WorkspaceScreen(projectId: state.pathParameters['id']!),
+        routes: [
+          GoRoute(
+            path: 'review',
+            builder: (context, state) =>
+                ReviewScreen(projectId: state.pathParameters['id']!),
+          ),
+        ],
       ),
     ],
   );

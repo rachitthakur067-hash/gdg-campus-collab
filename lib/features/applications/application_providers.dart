@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/application_repository.dart';
 import '../../models/application.dart';
 import '../auth/auth_provider.dart';
+import '../activity/activity_providers.dart';
 import '../marketplace/providers.dart';
 
 /// To use the real backend later, swap MockApplicationRepository() only.
@@ -39,6 +40,11 @@ class ApplicationActions {
 
   Future<void> apply(Application application) async {
     await _ref.read(applicationRepoProvider).apply(application);
+    await _ref.read(activityLoggerProvider).log(
+        projectId: application.projectId,
+        message:
+            '${application.displayName} applied to ${application.projectTitle}',
+        toClient: true);
     _refresh();
   }
 
@@ -46,6 +52,14 @@ class ApplicationActions {
   /// what will open the workspace in Phase 5.
   Future<void> setStatus(Application a, ApplicationStatus status) async {
     await _ref.read(applicationRepoProvider).updateStatus(a.id, status);
+    final logger = _ref.read(activityLoggerProvider);
+    final who = _ref.read(authProvider)?.name ?? 'The client';
+    await logger.log(
+        projectId: a.projectId,
+        message: status == ApplicationStatus.accepted
+            ? '$who accepted ${a.displayName}. The workspace is open.'
+            : '$who marked ${a.displayName} as ${status.label.toLowerCase()}',
+        recipients: await logger.applicationRecipients(a));
     if (status == ApplicationStatus.accepted) {
       await _ref.read(projectActionsProvider).markInProgress(a.projectId);
     }

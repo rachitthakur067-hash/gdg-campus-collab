@@ -183,7 +183,7 @@ class _SubmitSheetState extends ConsumerState<SubmitSheet> {
     }
     await ref
         .read(workspaceActionsProvider)
-        .submitMilestone(widget.milestone.id, _link.text.trim());
+        .submitMilestone(widget.milestone, _link.text.trim());
     if (mounted) Navigator.of(context).pop();
   }
 
@@ -236,7 +236,7 @@ class _ReviewSheetState extends ConsumerState<ReviewSheet> {
 
   Future<void> _finish(bool approved) async {
     await ref.read(workspaceActionsProvider).reviewMilestone(
-        widget.milestone.id, _items, _feedback.text.trim(), approved);
+        widget.milestone, _items, _feedback.text.trim(), approved);
     if (mounted) Navigator.of(context).pop();
   }
 
