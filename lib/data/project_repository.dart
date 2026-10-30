@@ -60,6 +60,19 @@ class MockProjectRepository implements ProjectRepository {
       clientName: 'AgriTech Labs',
       deliverables: 'Figma file and exported assets',
     ),
+    Project(
+      id: 'p5',
+      title: 'Hostel complaint portal',
+      description:
+          'An app where hostel residents log complaints and track their resolution.',
+      domain: 'Mobile',
+      skills: ['Flutter', 'Firebase'],
+      deadline: DateTime(2026, 12, 5),
+      status: ProjectStatus.inProgress,
+      clientId: 'u2',
+      clientName: 'Priya Mehta',
+      deliverables: 'Working app, source code and a short user guide',
+    ),
   ];
 
   @override

@@ -9,6 +9,7 @@ import '../marketplace/marketplace_screen.dart';
 import '../profile/profile_screen.dart';
 import '../shared/placeholder_screen.dart';
 import '../teams/teams_screen.dart';
+import '../workspace/workspace_list_screen.dart';
 
 class _TabDef {
   const _TabDef(this.label, this.icon, this.page);
@@ -21,29 +22,26 @@ class _TabDef {
 /// build each phase.
 List<_TabDef> _tabsFor(UserRole role) {
   const profile = _TabDef('Profile', Icons.person_outline, ProfileScreen());
+  const feed = _TabDef(
+      'Feed',
+      Icons.notifications_none,
+      PlaceholderScreen(
+          title: 'Activity', hint: 'Phase 6: notification feed.'));
   switch (role) {
     case UserRole.student:
       return [
         const _TabDef('Browse', Icons.search, MarketplaceScreen()),
         const _TabDef('Applied', Icons.send_outlined, MyApplicationsScreen()),
         const _TabDef('Teams', Icons.groups_outlined, TeamsScreen()),
-        const _TabDef(
-            'Workspace',
-            Icons.checklist,
-            PlaceholderScreen(
-                title: 'Workspace',
-                hint: 'Phase 5: tasks, milestones and discussion.')),
+        const _TabDef('Workspace', Icons.checklist, WorkspaceListScreen()),
         profile,
       ];
     case UserRole.client:
       return [
         const _TabDef('Listings', Icons.list_alt, MarketplaceScreen()),
         const _TabDef('Applicants', Icons.groups_outlined, ApplicantsScreen()),
-        const _TabDef(
-            'Feed',
-            Icons.notifications_none,
-            PlaceholderScreen(
-                title: 'Activity', hint: 'Phase 6: notification feed.')),
+        const _TabDef('Workspace', Icons.checklist, WorkspaceListScreen()),
+        feed,
         profile,
       ];
     case UserRole.mentor:
@@ -55,12 +53,8 @@ List<_TabDef> _tabsFor(UserRole role) {
             Icons.rate_review_outlined,
             PlaceholderScreen(
                 title: 'Reviews',
-                hint: 'Phase 5: review milestones with a checklist.')),
-        const _TabDef(
-            'Feed',
-            Icons.notifications_none,
-            PlaceholderScreen(
-                title: 'Activity', hint: 'Phase 6: notification feed.')),
+                hint: 'Mentor reviews come after the client flow is done.')),
+        feed,
         profile,
       ];
   }

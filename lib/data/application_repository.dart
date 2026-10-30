@@ -5,6 +5,7 @@ abstract class ApplicationRepository {
   Future<List<Application>> byApplicant(String applicantId);
   Future<List<Application>> byProject(String projectId);
   Future<List<Application>> byClient(String clientId);
+  Future<List<Application>> accepted();
   Future<void> updateStatus(String id, ApplicationStatus status);
 }
 
@@ -33,6 +34,19 @@ class MockApplicationRepository implements ApplicationRepository {
       proposal: 'A design-first team. We will start with user research and wireframes.',
       createdAt: DateTime(2026, 10, 28),
     ),
+    Application(
+      id: 'a3',
+      projectId: 'p5',
+      projectTitle: 'Hostel complaint portal',
+      clientId: 'u2',
+      applicantId: 'u1',
+      applicantName: 'Riya Sharma',
+      teamId: 't1',
+      teamName: 'Code Crew',
+      proposal: 'We built a similar feedback app for our fest and can reuse the core.',
+      createdAt: DateTime(2026, 10, 20),
+      status: ApplicationStatus.accepted,
+    ),
   ];
 
   @override
@@ -56,6 +70,10 @@ class MockApplicationRepository implements ApplicationRepository {
   @override
   Future<List<Application>> byClient(String clientId) async =>
       _items.where((a) => a.clientId == clientId).toList();
+
+  @override
+  Future<List<Application>> accepted() async =>
+      _items.where((a) => a.status == ApplicationStatus.accepted).toList();
 
   @override
   Future<void> updateStatus(String id, ApplicationStatus status) async {

@@ -11,6 +11,7 @@ import '../features/marketplace/create_project_screen.dart';
 import '../features/marketplace/project_detail_screen.dart';
 import '../features/teams/create_team_screen.dart';
 import '../features/teams/team_profile_screen.dart';
+import '../features/workspace/workspace_screen.dart';
 import '../models/app_user.dart';
 
 /// Redirects by login state: logged out -> /login, logged in -> /home.
@@ -60,6 +61,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/team/:id',
         builder: (context, state) =>
             TeamProfileScreen(teamId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/workspace/:id',
+        builder: (context, state) =>
+            WorkspaceScreen(projectId: state.pathParameters['id']!),
       ),
     ],
   );
